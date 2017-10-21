@@ -12,6 +12,10 @@
  * @return : return a non-empty string if converting successfully, and return empty string otherwise.
  */
 std::string mat_to_string(cv::Mat& mat_img, int n_compress = 95){
+	if(mat_img.empty() || n_compress < 0 || n_compress > 100){
+		return std::string("");
+	}
+
 	std::vector<uchar> vec_img_buff;
 	std::vector<int>   vec_params = std::vector<int>(2);
 	vec_params[0] = CV_IMWRITE_JPEG_QUALITY;
@@ -25,6 +29,25 @@ std::string mat_to_string(cv::Mat& mat_img, int n_compress = 95){
 	}
 
 	return str_img_string;
+}
+
+/**
+ * Convert image string, which is encoding with 'mat_to_string', into cv::Mat.
+ * 
+ * @param str_img_string : _IN_ image data string
+ * @return : cv::Mat object, if input an empty string, it will return an empty cv::Mat.
+ */
+cv::Mat string_to_mat(const std::string& str_img_string){
+	if(str_img_string.empty()){
+		return cv::Mat();
+	}
+
+	cv::vector<uchar> vec_img_buff;
+	for(int i = 0; i < str_img_string.length(); ++i)
+		vec_img_buff.push_back(str_img_string[i]);
+
+	cv::Mat mat_image = cv::imdecode(cv::Mat(vec_img_buff), CV_LOAD_IMAGE_COLOR);
+	return mat_image;
 }
 
 #endif
