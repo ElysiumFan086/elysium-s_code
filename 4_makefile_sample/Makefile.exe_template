@@ -1,0 +1,95 @@
+# Modify the name of generating excution file
+EXEC := program_name
+# Modify the generating path
+EXEPATH := ./
+
+# Add linking library here, for OpenCV related libraries, you can add with following command:
+#    `pkg-config --cflags --libs opencv` 
+# Excution binary file 'pkg-config' is asked, if you do not have, you can install with 'apt-get'
+LIBS := -lboost_system -lboost_filesystem -lboost_thread -lboost_thread
+
+# Add library path for '.so' files here
+LIBPATHS := /usr/local/lib /usr/lib/x86_64-linux-gnu /usr/local/cuda-8.0/lib64
+
+# Add include header fils' path here
+INCS := ./include/tool  ./include /usr/local/cuda-7.5/include /usr/local/include \
+        /usr/local/include/opencv /usr/local/include/opencv2 /usr/include/libxml2 \
+        ./include/mysql_connector/include ./include/tool/xls ./include/libssh2
+
+# Compile options
+CC := gcc -pthread
+CXX := g++ -pthread
+CFLAGS := -g -Wall -O
+
+OBJA = 
+
+CXXFLAGS := $(CFLAGS) 
+CXXFLAGS += -std=c++11
+
+# Complie with boost::log and boost::asio at the same time must add following option
+# CXXFLAGS += -DBOOST_LOG_DYN_LINK
+# CXXFLAGS += -DBOOST_ASIO_DISABLE_STD_ATOMIC
+
+RM-F := rm -f
+
+# Add source code path here
+SOURCE := $(wildcard ./src/*.cpp)
+SOURCE += ./include/ziplib/ZipOperation.cpp \
+          ./include/ziplib/unzip.c \
+          ./include/ziplib/adler32.c \
+          ./include/ziplib/compress.c \
+          ./include/ziplib/crc32.c \
+          ./include/ziplib/gzclose.c \
+          ./include/ziplib/gzlib.c \
+          ./include/ziplib/gzread.c \
+          ./include/ziplib/gzwrite.c \
+          ./include/ziplib/inftrees.c \
+          ./include/ziplib/ioapi.c \
+          ./include/ziplib/mztools.c
+
+OBJS := $(patsubst %.c,%.o,$(patsubst %.cpp,%.o,$(SOURCE)))
+DEPS := $(patsubst %.o,%.d,$(OBJS))
+CPPS := $(patsubst %.c,%.i,$(patsubst %.cpp,%.i,$(SOURCE)))
+MISSING_DEPS := $(filter-out $(wildcard $(DEPS)),$(DEPS))
+MISSING_DEPS_SOURCES := $(wildcard $(patsubst %.d,%.c,$(MISSING_DEPS)) \
+$(patsubst %.d,%.cpp,$(MISSING_DEPS)))
+CPPFLAGS += -MD
+CXXFLAGS += -MD
+CFLAGS += -MD
+
+.PHONY : everything deps objs cpps clean veryclean rebuild
+
+everything : $(EXEPATH)$(EXEC)
+
+deps : $(DEPS)
+
+objs : $(OBJS)
+
+cpps : $(CPPS)
+
+%.i: %.cpp
+	cpp $(CXXFLAGS) $(addprefix -I, $(INCS))  $< -o $@ 
+%.o: %.cpp
+	$(CXX) $(CXXFLAGS) $(addprefix -I, $(INCS)) -c $< -o $@ 
+%.o: %.c
+	$(CC) $(CFLAGS) $(addprefix -I, $(INCS)) -c $< -o $@ 
+
+clean :
+	@$(RM-F) $(DEPS) 
+	@$(RM-F) $(OBJS)
+
+veryclean: clean
+	@$(RM-F) $(exepath)$(exec)
+
+rebuild: veryclean everything
+
+ifneq ($(MISSING_DEPS),)
+$(MISSING_DEPS) :
+	@$(RM-F) $(patsubst %.d,%.o,$@)
+endif
+
+-include $(DEPS)
+
+$(EXEPATH)$(EXEC) : $(OBJS)
+	$(CXX) -o $(EXEPATH)$(EXEC) $(OBJS) $(OBJA) $(addprefix -I,$(INCS))  \
+		$(addprefix -L,$(LIBPATHS)) $(LIBS)

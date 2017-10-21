@@ -1,0 +1,111 @@
+# Modify shared library's file name here
+EXEC := libxxx.so
+# Modify generating path here
+EXEPATH := ./
+
+# Add linking libraries here
+LIBS := boost_system boost_filesystem boost_thread pthread 
+
+# Add Library path here
+LIBPATHS := ./ /usr/lib/x86_64-linux-gnu /usr/local/cuda-7.5/lib64/
+
+# Add include header file path here
+INCS := ./include
+
+# Complie options
+CC := gcc -pthread
+CXX := g++ -pthread
+# Complie static link library
+#CC := gcc -s -static -pthread    
+#CXX := g++ -s -static -pthread
+
+CFLAGS := -g  -Wall -DGPU_RUN -O
+#-D_DEBUG 
+#CFLAGS := -g -O2 -Wall -fpermissive -D_DEBUG
+#CFLAGS += -march=pentium4  -pipe -fomit-frame-pointer
+
+
+OBJA = 
+#../Linux/liba/blas_LINUX.a 
+
+
+#CFLAGS+= \
+#       -msse2 \
+#       -mmmx \
+#       -mfpmath=sse \
+#       -march=pentium4 \
+#       -pipe \
+#       -fomit-frame-pointer
+#
+#CXXFLAGS+= \
+#         -msse2 \
+#         -mmmx \
+#         -mfpmath=sse \
+#         -funroll-loops \
+#         -march=pentium4 \
+#         -pipe \
+#         -fomit-frame-pointer
+
+CXXFLAGS := $(CFLAGS)
+CXXFLAGS +=  -std=c++11 -fPIC -shared -march=native
+
+RM-F := rm -f
+
+SOURCE := $(wildcard ./*.cpp) \
+  $(wildcard ./faceDA/*.cpp)\
+  $(wildcard ./feature/*.cpp)\
+
+# $(wildcard ./src/*.cpp) $(wildcard ./src/Message/*.cpp)\
+# $(wildcard ./src_seamless/*.cpp) $(wildcard ./third/g3dlite/src/*.cpp) \
+
+
+#SOURCE := $(wildcard *.c) $(wildcard *.cpp)
+OBJS := $(patsubst %.c,%.o,$(patsubst %.cpp,%.o,$(SOURCE)))
+DEPS := $(patsubst %.o,%.d,$(OBJS))
+CPPS := $(patsubst %.c,%.i,$(patsubst %.cpp,%.i,$(SOURCE)))
+MISSING_DEPS := $(filter-out $(wildcard $(DEPS)),$(DEPS))
+MISSING_DEPS_SOURCES := $(wildcard $(patsubst %.d,%.c,$(MISSING_DEPS)) \
+$(patsubst %.d,%.cpp,$(MISSING_DEPS)))
+CPPFLAGS += -MD
+CXXFLAGS += -MD
+CFLAGS += -MD
+
+
+.PHONY : everything deps objs cpps clean veryclean rebuild
+
+everything : $(EXEPATH)$(EXEC)
+
+deps : $(DEPS)
+
+objs : $(OBJS)
+
+cpps : $(CPPS)
+
+%.i: %.cpp
+  cpp $(CXXFLAGS) $(addprefix -I, $(INCS))  $< -o $@ 
+%.o: %.cpp
+  $(CXX) $(CXXFLAGS) $(addprefix -I, $(INCS)) -c $< -o $@ 
+%.o: %.c
+  $(CC) $(CFLAGS) $(addprefix -I, $(INCS)) -c $< -o $@ 
+
+
+
+clean :
+  @$(RM-F) $(DEPS) 
+  @$(RM-F) $(OBJS)
+
+veryclean: clean
+  @$(RM-F) $(exepath)$(exec)
+
+rebuild: veryclean everything
+
+ifneq ($(MISSING_DEPS),)
+$(MISSING_DEPS) :
+  @$(RM-F) $(patsubst %.d,%.o,$@)
+endif
+
+-include $(DEPS)
+
+$(EXEPATH)$(EXEC) : $(OBJS)
+  $(CXX) -fPIC -shared -o $(EXEPATH)$(EXEC) $(OBJS) -fPIC -shared $(OBJA) $(addprefix -I,$(INCS))  \
+    $(addprefix -L,$(LIBPATHS)) $(addprefix -l,$(LIBS)) `pkg-config --cflags --libs opencv`
