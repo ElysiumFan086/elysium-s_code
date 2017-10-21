@@ -10,3 +10,5 @@ For now, it includes follwoing code:
 
 1> Feature extractor using Caffe with deep learning model;
 2> MySQL connection pool class with ConnCpp library;
+3> Some function code based on OpenCV library;
+4> Other useful fucntions which may be usualy used, such string processing, file operation.
