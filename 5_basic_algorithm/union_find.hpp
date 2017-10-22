@@ -1,3 +1,4 @@
+
 #ifndef _UNION_FIND_H_
 #define _UNION_FIND_H_
 
@@ -25,6 +26,17 @@ public:
 				p_height[i]  = 1;
 			}
 			n_component_nb = n_vertex_nb;
+		}
+	}
+	
+	~UnionFind(){
+		if(p_height != nullptr){
+			delete[] p_height;
+			p_height = nullptr;
+		}
+		if(p_parents != nullptr){
+			delete[] p_parents;
+			p_parents = nullptr;
 		}
 	}
 
@@ -83,7 +95,7 @@ private:
 		}
 	}
 
-	unsigned int* p_parents;	    // Arrays for every node's parent node
+	unsigned int* p_parents;        // Arrays for every node's parent node
 	unsigned int* p_height;         // Arrays for every node's height(also regarding as the size of current connected compenent)
 
 	unsigned int n_vertex_nb;       // The total vertexes number of the set(or graph)
