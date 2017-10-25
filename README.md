@@ -17,3 +17,4 @@ For now, it includes follwoing code:
     4> Makefile template used in Linux-like platform, including two version: compiling excutable binary file or shared library;
     5> Implamentation code for some basic algorithms, such as searching, sorting, and so on;
     6> Other useful fucntions which may be usualy used, such string processing, file operation.
+    7> A helper tool, with which one can get video file's basic information for standard video, Hiakang video, Dahua video and Hanbang Video;(later version will add decode interface, with which users can can decoding frame from video file)

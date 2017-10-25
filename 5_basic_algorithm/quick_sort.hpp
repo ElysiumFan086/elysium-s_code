@@ -27,7 +27,7 @@ void do_quick_sort(int* p_data, std::size_t n_low, std::size_t n_high){
 void quick_sort(int* p_data, std::size_t n_size){
 	if(p_data == NULL || n_size == 0)  return;
 
-	do_quick_sort(p_data, 0, n_size);
+	do_quick_sort(p_data, 0, n_size - 1);
 }
 
 #endif
