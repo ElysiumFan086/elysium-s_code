@@ -1,0 +1,39 @@
+1. Compile with Boost thread pool(with Boost version later than 1.50), you may face the error "TIME_UTC undefined". 
+   If so, you have to replace all the 'TIME_UTC' identifiers in Boost code to 'TIOME_UTC_', because in C++11, there 
+   exists a Macro with the same name.
+
+2. Compile with OpenCV togeter with Windows system header files, you may meet the error containing the key words like:
+   "ACCESS_MASK conflicate". This is because in both 'Winnt.h' and OpenCV header files defined a Macro named 'ACCESS_MASK'.
+   The safest approach when using Windows header files and OpenCV APIs is NOT to write following code in any file of you code:
+          using namespace cv;
+   If you want to reference any OpenCV class or functions, do it as below, and remember this is of greet importance:
+          cv::Mat mat_img = cv::imread(str_img_path);
+
+3. If you are compile with a previous version of 'ffmpeg', you may see the error similar to:
+          'some function in ffmpeg is deprecated'
+   To solve this problems, the best way is updating your 'ffmpeg' to a latest version. If not, your can uncheck SDL setting in VS:
+          Project Properties --> Configuration Properties --> C/C++ --> SDL Checking
+
+4. If you want to compile some code with C or early code, some Macros have to be defined:
+   (1) _CRT_SECURE_NO_WARNINGS
+   (2) WIN32_LEAN_AND_MEAN
+   (3) GLOG_NO_ABBREVIATED_SEVERITIES
+   
+5. When using library 'boost::asio', error message may tell you 'WinSock.h' has already been included. There are 3 ways to solve:
+   (1) Define Macro 'WIN32_LEAN_AND_MEAN';
+   (2) Include 'winsock2.h' ahead of 'Windows.h';
+   (3) Include 'asio.hpp' ahead of 'Windows.h';
+
+6. Compiling with Boost may get error message tells you 'xtime' unspecified symbol. It is similar to Issue Two, do NOT write code like:
+        using namespace boost;
+   in your code. And for more details, in Visual Studio, itself defined an identifier named '::xtime'.
+
+7. In some code using std::min/std::max, you may get error C2059: Syntax error. This is because in 'Windows.h', there is a Macro with the 
+   same name. To solve this problem, you can define Macro 'NO_MINMAX' for compilor, 
+   or replace 'std::max(..., ...)' with '(std::max(..., ...)'.
+
+8. Compiling Caffe you may face the error message like '__float128 is undefined' etc.
+   You have to modify the file in path:
+      /usr/local/include/boost/config/compiler/gcc.hpp
+   At the end of Line 156, adding:
+      && !defined(_CUDACC_)
