@@ -14,6 +14,11 @@
 12  p[x] ← y 
 */
 
+/**
+ * Below is a simple definition of iterator for black red tree, which references from the code
+ * of SGI STL.
+ */
+
 typedef bool __rb_tree_color_type;
 const __rb_tree_color_type  __rb_tree_red   = false;
 const __rb_tree_color_type  __rb_tree_black = true;
