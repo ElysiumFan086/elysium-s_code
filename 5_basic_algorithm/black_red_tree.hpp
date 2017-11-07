@@ -159,4 +159,19 @@ void insert_case4_step2(struct Node* n) {
 	g->color = RED;
 }
 
+/********************************************************/
+/*           Black-Red Tree deleting operations         */
+/********************************************************/
+void delete_one_child(struct Node* n) {
+	struct Node* child = is_leaf(n_right) ? n->left : n->right;
+	replace_node(n, child);
+
+	if(n->color == BLACK) {
+		if(child->color == RED)    child->color = BLACK;
+		else delete_case1(child);
+	}
+
+	free(n);
+}
+
 #endif
