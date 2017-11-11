@@ -5,8 +5,8 @@ std::size_t partition(int* p_data, std::size_t n_low, std::size_t n_high){
 	int n_pivot = p_data[n_low];
 	while(n_low < n_high){
 		while(n_low < n_high && p_data[n_high] > n_pivot)  --n_high;
+		p_data[n_low] = p_data[n_high];
 		while(n_low < n_high && p_data[n_low] < n_pivot)   ++n_low;
-
 		p_data[n_high] = p_data[n_low];
 	}
 
