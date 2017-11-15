@@ -70,3 +70,30 @@ void cycle_leader(int* p_idx, std::size_t n_from, int n_mod) {
 
 	p_idx[n_from] = n_last_idx;
 }
+
+void perfect_shuttle(int* p_idx, std::size_t n_pair_size) {
+	std::size_t N = 2 * n_pair_size, _n_pair_size = n_pair_size;
+	int n_temp = 0, m = 1, k = 0;
+	while(_n_pair_size > 1) {
+		// Step 1: finding 'm' and 'k' with 2m = 3^k - 1
+		N = 2 * n_pair_size;
+		for(k = 0, m = 1; N / m >= 3; ++k, m *= 3);
+		m /= 2;
+		// Finding 'k' and 'm' makes: 3^k <= 2*n < 3^(k+1)
+
+		// Step 2: rotate array 
+		right_rotate(p_idx + m, n_pair_size, m);
+
+		// Step 3
+		for(int i = 0, n_temp = 1; i < k; ++i, n_temp *= 3)
+			cycle_leader(p_idx, n_temp, m * 2 + 1);
+
+		// Step 4
+		p_idx += 2 * m;
+		_n_pair_size -= m;
+	}
+
+	n_temp = p_idx[1];
+	p_idx[1] = p_idx[2];
+	p_idx[2] = n_temp;
+}
