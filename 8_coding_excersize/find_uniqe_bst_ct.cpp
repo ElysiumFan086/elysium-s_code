@@ -35,3 +35,44 @@ int getTreeNum(int n_node_nb) {
 	delete[] p_res;
 	return n_tree_nb;
 }
+
+
+
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+ * };
+ *
+ * Listing all the diffrent BST with n nodes.
+ */
+std::vector<TreeNode*> generateTrees(int n) {
+    if(n == 0)  return {};
+    return *generate_trees_dfs(1, n);
+}
+
+std::vector<TreeNode*>* generate_trees_dfs(int start, int end) {
+    std::vector<TreeNode*> *sub_tree = new std::vector<TreeNode*>();
+    if(start > end)  sub_tree->push_back(NULL);
+    else {
+        for(int i = start; i <= end; ++i) {
+            std::vector<TreeNode*>* left_sub_tree  = generate_trees_dfs(start, i - 1);
+            std::vector<TreeNode*>* right_sub_tree = generate_trees_dfs(i + 1, end);
+            
+            for(int j = 0; j < left_sub_tree->size(); ++j) {
+                for(int k = 0; k < right_sub_tree->size(); ++k) {
+                    TreeNode* node = new TreeNode(i);
+                    node->left  = left_sub_tree->at(j);
+                    node->right = right_sub_tree->at(k);
+                    
+                    sub_tree->push_back(node);
+                }
+            }
+        }
+    }
+    
+    return sub_tree;
+}
