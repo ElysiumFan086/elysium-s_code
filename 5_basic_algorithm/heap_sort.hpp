@@ -64,39 +64,42 @@ int get_right_child(int n){
  * nodes, this procedure's time costing is O[log(n)], which can be also regarded as
  * O[h], here 'h' meanes the hight of sub-tree.
  */
-void max_heapify(int* p_data, int n_heap_size, int n_root){
+template<class Predictor>
+void adjust_heapify(int* p_data, int n_heap_size, int n_root, Predictor compare){
 	int n_lchild = get_left_child(n_root);
 	int n_rchild = get_right_child(n_root);
 
-	int n_large_node = n_root;
-	if(n_lchild < n_heap_size && p_data[n_lchild] > p_data[n_root]){
-		n_large_node = n_lchild;
+	int n_new_root = n_root;
+	if(n_lchild < n_heap_size && compare(p_data[n_lchild], p_data[n_root])){
+		n_new_root = n_lchild;
 	}
 
-	if(n_rchild < n_heap_size && p_data[n_rchild] > p_data[n_large_node]){
-		n_large_node = n_rchild;
+	if(n_rchild < n_heap_size && compare(p_data[n_rchild], p_data[n_new_root])){
+		n_new_root = n_rchild;
 	}
 
-	if(n_large_node != n_root){
-		int n_temp = p_data[n_large_node];
-		p_data[n_large_node] = p_data[n_root];
+	if(n_new_root != n_root){
+		int n_temp = p_data[n_new_root];
+		p_data[n_new_root] = p_data[n_root];
 		p_data[n_root] = n_temp;
 
-		max_heapify(p_data, n_heap_size, n_large_node);
+		adjust_heapify(p_data, n_heap_size, n_new_root, compare);
 	}
 }
 
-void build_max_heap(int* p_data, int n_size){
+template<class Predictor>
+void build_heap(int* p_data, int n_size, Predictor compare){
 	for(int i = n_size / 2 - 1; i >= 0; --i){
-		max_heapify(p_data, n_size, i);
+		max_heapify(p_data, n_size, i, compare);
 	}
 }
 
-void heap_sort_v2(int* p_data, int n_size){
-	build_max_heap(p_data, n_size);
+template<class Predictor>
+void heap_sort_v2(int* p_data, int n_size, Predictor compare){
+	build_heap(p_data, n_size, compare);
 	for(int i = n_size - 1; i >= 1; --i){
 		swap(p_data, 0, i);
-		max_heapify(p_data, i, 0);
+		adjust_heapify(p_data, i, 0, compare);
 	}
 }
 
