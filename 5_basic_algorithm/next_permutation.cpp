@@ -1,4 +1,5 @@
 
+
 /**
 Possible implementation in STL
 
@@ -45,4 +46,25 @@ bool get_next_permutation(char* p_perm, int n_size) {
 	std::swap(p_perm[i], p_perm[k]);
 	// [4] Reverse the substring from position 'i' to the end of the string
 	std::reverse(p_perm + i + 1, p_perm + n_size);
+}
+
+template<class BidirItr>
+bool next_permutation(BidirItr first, BidirItr last) {
+        const auto rfirst = reverse_iterator<BidirItr>(last);
+        const auto rlast  = reverse_iterator<BidirItr>(first);
+        
+        auto pivot = std::next(rfirst);
+        while(pivot != rlast && *pivot >= *std::prev(pivot))    ++pivot;
+        
+        if(pivot == rlast) {
+            std::reverse(rfirst, rlast);
+            return false;
+        }
+        
+        auto change = std::find_if(rfirst, pivot, std::bind1st(std::less<int>(), *pivot));
+        
+        std::swap(*change, *pivot);
+        std::reverse(rfirst, pivot);
+        
+        return true;
 }
