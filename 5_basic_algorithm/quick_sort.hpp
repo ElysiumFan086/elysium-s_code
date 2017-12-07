@@ -30,4 +30,30 @@ void quick_sort(int* p_data, std::size_t n_size){
 	do_quick_sort(p_data, 0, n_size - 1);
 }
 
+template<class ForwardIt, class UnaryPredict>
+ForwardIt partition(ForwardIt first, ForwardIt last, UnaryPredict pred) {
+	first = std::find_if_not(first, last, pred);
+	if(first == last)    return first;
+
+	for(auto i = std::next(first); i != last; ++i) {
+		if(pred(*i)) {
+			std::iter_swap(i, first);
+			++first;
+		}
+	}
+
+	return first;
+}
+
+template<class ForwardIt>
+void quick_sort(ForwardIt first, ForwardIt last) {
+	if(first == last)    return;
+	auto pivot = std::next(first, std::distance(first, last) / 2);
+	ForwardIt middle1 = partition(first, last, [pivot] (const auto& e) { return e < pivot; });
+	ForwardIt middle2 = partition(middle1, last, [pivot] (const auto& e) { return !(e > pivot); });
+
+	quick_sort(first, middle1);
+	quick_sort(middle2, last);
+}
+
 #endif
